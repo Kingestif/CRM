@@ -1,0 +1,15 @@
+{
+  "name": "orbitcrm",
+  "version": "1.0.0",
+  "description": "customer relation management software",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "estifanos zinabu",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "morgan": "^1.10.0"
+  }
+}
