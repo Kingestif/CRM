@@ -1,79 +1,93 @@
+const Contact = require('../models/contactsModel');
+
 const getAllContacts = async (req, res) => {
     try {
+        const allContacts = await Contact.find();
+
         res.status(200).json({
             status: "Success",
-            // requestTime: req.requestTime,
+            length: allContacts.length,
             data: {
-                contact: "All contacts"
+                contact: allContacts
             },
         });
         
     } catch (error) {
-        res.status(404).json({
-            status: "Failed",
+        res.status(500).json({
+            status: "Failure",
             data: {
-                contact: "Failed to Get All contacts"
+                Message: error.message
             },
         });
-        
     }
-    
-    
 };
 
 const getContact = async (req, res) => {
     try {
+        const oneContact = await Contact.findById(req.params.id);
+        if(!oneContact){
+            return res.status(404).json({
+                status: "Failure",
+                data: {
+                    Message: "Contact not found"
+                },
+            });
+        }
+
         res.status(200).json({
             status: "Success",
             data: {
-                contact: "Single Contact"
+                contact: oneContact
             },
         });
-        
+
     } catch (error) {
         res.status(404).json({
             status: "Failed",
             data: {
-                contact: "Failed to Get Single Contact"
+                Message: error.message
             },
         });
-        
     }
     
 };
 
 const addContact = async(req,res) => {
     try {
+        const newContact = await Contact.create(req.body);
         res.status(201).json({
             status: "Success",
             data: {
-                contact: "Added Contact"
+                contact: newContact
             },
         });
         
     } catch (error) {
-        res.status(404).json({
-            status: "Failed",
+        res.status(400).json({
+            status: "Failed to Create a Lead",
             data: {
-                contact: "Failed to Add Contact"
+                Message: error.message
             },
-        });
+        }); 
     }
-    
 };
 
 const updateContact = async(req,res) => {
     try {
+        const updContact = await Contact.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+
         res.status(200).json({
             status: "Success",
-            requestTime: req.requestTime,
             data: {
-                contact: "Updated Contact"
+                contact: updContact
             },
         });
         
     } catch (error) {
-        res.status(404).json({
+        res.status(500).json({
             status: "Failed",
             data: {
                 contact: "Failed to Updated Contact"
@@ -84,6 +98,7 @@ const updateContact = async(req,res) => {
 
 const deleteContact = async(req,res) =>{
     try {
+        await Contact.findByIdAndDelete(req.params.id)
         res.status(204).json({
             status: "Success",
             data:{
@@ -101,42 +116,88 @@ const deleteContact = async(req,res) =>{
 };
 
 
-const handleSearch = (type, query, res) =>{
-    const {name, email, phone, company} = query
-    if(name){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Name`
-            },
-        });
-    }else if(email){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Email`
-            },
-        });
-    }else if(phone){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Phone`
-            },
-        });
-    }else if(company){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Company`
-            },
-        });
+const handleSearch = async (type, query, res) =>{
+    try {
+        const {name, email, phone, company} = query
+        if(name){
+            const searchContact = await Contact.findOne({ name: name });
+            if(!searchContact){
+                return res.status(404).json({
+                    status: "Failure",
+                    data: {
+                        Message: "Contact not found"
+                    },
+                });
+            }
+    
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Contact: searchContact
+                },
+            });
+    
+        }else if(email){
+            const searchContact = await Contact.findOne({ email: email });
+            if(!searchContact){
+                return res.status(404).json({
+                    status: "Failure",
+                    data: {
+                        Message: "Contact not found"
+                    },
+                });
+            }
+    
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Contact: searchContact
+                },
+            });
+    
+        }else if(phone){
+            const searchContact = await Contact.findOne({ phoneNo: phone });
+            if(!searchContact){
+                return res.status(404).json({
+                    status: "Failure",
+                    data: {
+                        Message: "Contact not found"
+                    },
+                });
+            }
+    
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Contact: searchContact
+                },
+            });
+    
+        }else if(company){
+            const searchContact = await Contact.find({ company: company });
+            if(searchContact.length == 0){
+                return res.status(404).json({
+                    status: "Failure",
+                    data: {
+                        Message: "Contact not found"
+                    },
+                });
+            }
+    
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Contact: searchContact
+                },
+            });
+        }
+        
+    } catch (error) {
+        return res.status(400).json({
+            status: "Failed",
+            message: `Invalid or missing search parameters. Provide email, name, phone, or company for ${type}.`,
+        }); 
     }
-
-    return res.status(400).json({
-        status: "Failed",
-        message: `Invalid or missing search parameters. Provide email, name, phone, or company for ${type}.`,
-    });
 
 }
 

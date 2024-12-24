@@ -1,38 +1,116 @@
-const handleSearch = (type, query, res) =>{
+const Contact = require("../models/contactsModel");
+const Lead = require("../models/leadsModel");
+
+
+const handleSearch = async (type, query, res) =>{
     const {name, email, phone, company} = query
     if(name){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Name`
-            },
-        });
+        const searchLead = await Lead.findOne({ name: name });
+        const searchContact = await Contact.findOne({name:name});
+
+        if(!searchLead && !searchContact){
+            return res.status(404).json({
+                status: "Failed",
+                data: {
+                    Message: "Customer not found"
+                },
+            });
+
+        }else if(searchLead){
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Customer: searchLead
+                },
+            });
+        }else{
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Customer: searchContact
+                },
+            });
+        }
+
     }else if(email){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Email`
-            },
-        });
+        const searchLead = await Lead.findOne({ email: email });
+        const searchContact = await Contact.findOne({email:email});
+
+        if(!searchLead && !searchContact){
+            return res.status(404).json({
+                status: "Failed",
+                data: {
+                    Message: "Customer not found"
+                },
+            });
+
+        }else if(searchLead){
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Customer: searchLead
+                },
+            });
+        }else{
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Customer: searchContact
+                },
+            });
+        }
     }else if(phone){
+        const searchLead = await Lead.findOne({ phoneNo: phone });
+        const searchContact = await Contact.findOne({phoneNo:phone});
+
+        if(!searchLead && !searchContact){
+            return res.status(404).json({
+                status: "Failed",
+                data: {
+                    Message: "Customer not found"
+                },
+            });
+
+        }else if(searchLead){
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Customer: searchLead
+                },
+            });
+        }else{
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Customer: searchContact
+                },
+            });
+        }
+    }
+    else if(company){
+        const searchLead = await Lead.find({ company: company });
+        const searchContact = await Contact.find({company:company});
+
+        const combinedCustomer = [...searchLead, ...searchContact];
+
+        if(combinedCustomer === 0){
+            return res.status(404).json({
+                status: "Failed",
+                data: {
+                    Message: "Customer not found"
+                },
+            });
+        }
+
         return res.status(200).json({
             status: "Success",
-            data: {
-                Lead: `Search ${type} by Phone`
-            },
-        });
-    }else if(company){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Company`
-            },
+            Customer: combinedCustomer
         });
     }
 
     return res.status(400).json({
         status: "Failed",
-        message: `Invalid or missing search parameters. Provide email, name, phone, or company for ${type}.`,
+        Message: error.message
     });
 
 }
@@ -44,7 +122,7 @@ const searchBoth = async(req,res) =>{
         res.status(500).json({
             status:"Failed",
             data: {
-                Lead: "An unexpected error occurred while searching for Contacts & Leads."
+                Message: error.message
             },
         });
     }
@@ -53,17 +131,37 @@ const searchBoth = async(req,res) =>{
 
 const getSingleCustomer = async(req,res) =>{
     try {
-        res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: "Get Single Customer"
-            },
-        });
+        const findContacts = await Contact.findById(req.params.id);
+        const findLeads = await Lead.findById(req.params.id);
+
+        if(!findContacts && !findLeads){
+            return res.status(404).json({
+                status: "Failed",
+                data: {
+                    Message: "Customer not found"
+                },
+            });
+        }else if(findContacts){
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Customer: findContacts
+                },
+            });
+        }else{
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Customer: findLeads
+                },
+            });
+        }
+
     } catch (error) {
         res.status(404).json({
             status: "Failed",
             data: {
-                Lead: "Failed to get a Customer"
+                Message: error.message
             },
         });
     }
@@ -72,10 +170,21 @@ const getSingleCustomer = async(req,res) =>{
 
 const getAllCustomers = async (req, res) => {
     try {
-        res.status(200).json({
+        const [contacts, leads] = await Promise.all([
+            Contact.find(),
+            Lead.find()
+        ]);
+
+        const combinedUsers = {
+            contacts,
+            leads
+        };
+
+        return res.status(200).json({
             status: "Success",
+            length: contacts.length + leads.length,
             data: {
-                contact: "All Customers"
+                Customers: combinedUsers
             },
         });
         
@@ -83,10 +192,9 @@ const getAllCustomers = async (req, res) => {
         res.status(404).json({
             status: "Failed",
             data: {
-                contact: "Failed to Get All Customers"
+                Message: error.message
             },
         });
-        
     }
 };
 

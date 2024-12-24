@@ -7,10 +7,10 @@ const bothRouter = require('./routes/bothRoutes')
 const morgan = require('morgan');
 
 
-app.use(express.json());
-app.use(morgan('dev'));
+app.use(express.json()); 
+app.use(morgan('dev'));    
 
-app.use((req, res, next) => {
+app.use((req,res,next) => {
     req.requestTime = new Date().toISOString();
     next();
 });

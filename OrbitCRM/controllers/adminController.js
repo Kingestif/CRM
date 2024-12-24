@@ -1,29 +1,40 @@
+const Lead = require("../models/leadsModel");
+
 const getPendingLead = async(req,res) =>{
     try {
-        res.status(200).json({
+        const pendLead = await Lead.findById(req.params.id);
+        if(!pendLead){
+            return res.status(404).json({
+                status: "Failed",
+                data: {
+                    Lead: "Lead not found"
+                },
+            });
+        }
+        return res.status(200).json({
             status: "Success",
             data: {
-                Lead: "Get Single Pending Lead"
+                Lead: pendLead
             },
         });
     } catch (error) {
-        res.status(404).json({
+        return res.status(404).json({
             status: "Failed",
             data: {
-                Lead: "Failed to get a lead"
+                Lead: erorr.message
             },
         });
     }
-    
 };
 
 const getAllPendingLeads = async(req,res) =>{
 
+    const pendLead = await Lead.find({status:"Pending"});
     try{
         return res.status(200).json({
             status: "Success",
             data: {
-                Lead: "Get All Pending Leads"
+                Lead: pendLead
             },
         });
 
@@ -41,60 +52,110 @@ const getAllPendingLeads = async(req,res) =>{
 
 const updatePendingLead = async(req,res) =>{
     try {
+        const updLead = await Lead.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+
         res.status(200).json({
             status: "Success",
             data: {
-                Lead: "Updated Pending Lead"
+                Lead: updLead
             },
         });
         
     } catch (error) {
-        res.status(404).json({
+        res.status(500).json({
             status: "Failed",
             data: {
-                Lead: "Failed to Update Pending Lead"
+                Lead: error.message || "Failed to update Lead"
             },
         });
     }
 };
 
 
-const handleSearch = (type, query, res) =>{
-    const {name, email, phone, company} = query
-    if(name){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Name`
-            },
-        });
-    }else if(email){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Email`
-            },
-        });
-    }else if(phone){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Phone`
-            },
-        });
-    }else if(company){
-        return res.status(200).json({
-            status: "Success",
-            data: {
-                Lead: `Search ${type} by Company`
-            },
+const handleSearch = async (type, query, res) =>{
+    try {
+        const {name, email, phone, company} = query
+        if(name){
+            const searchLead = await Lead.findOne({ name: name });
+            if(!searchLead){
+                return res.status(404).json({
+                    status: "Failure",
+                    data: {
+                        Message: "Lead not found"
+                    },
+                });
+            }
+    
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Lead: searchLead
+                },
+            });
+    
+        }else if(email){
+            const searchLead = await Lead.findOne({ email: email });
+            if(!searchLead){
+                return res.status(404).json({
+                    status: "Failure",
+                    data: {
+                        Message: "Lead not found"
+                    },
+                });
+            }
+    
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Lead: searchLead
+                },
+            });
+    
+        }else if(phone){
+            const searchLead = await Lead.findOne({ phoneNo: phone });
+            if(!searchLead){
+                return res.status(404).json({
+                    status: "Failure",
+                    data: {
+                        Message: "Lead not found"
+                    },
+                });
+            }
+    
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Lead: searchLead
+                },
+            });
+    
+        }else if(company){
+            const searchLead = await Lead.find({ company: company });
+            if(searchLead.length == 0){
+                return res.status(404).json({
+                    status: "Failure",
+                    data: {
+                        Message: "Lead not found"
+                    },
+                });
+            }
+    
+            return res.status(200).json({
+                status: "Success",
+                data: {
+                    Lead: searchLead
+                },
+            });
+        }
+    } catch (error) {
+        return res.status(400).json({
+            status: "Failed",
+            message: `Invalid or missing search parameters. Provide email, name, phone, or company for ${type}.`,
         });
     }
-
-    return res.status(400).json({
-        status: "Failed",
-        message: `Invalid or missing search parameters. Provide email, name, phone, or company for ${type}.`,
-    });
 
 }
 
@@ -117,5 +178,4 @@ module.exports = {
     getAllPendingLeads,
     updatePendingLead,
     searchPendingLead
-
 }
