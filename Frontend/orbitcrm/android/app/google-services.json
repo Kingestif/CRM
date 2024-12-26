@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "226127696709",
+    "project_id": "flutter-firebase-e35ca",
+    "storage_bucket": "flutter-firebase-e35ca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226127696709:android:2563562e07fc57624da42c",
+        "android_client_info": {
+          "package_name": "com.example.orbitcrm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhZtRRmlJ1UgRDFu47tK4z6lu00MVlTlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
