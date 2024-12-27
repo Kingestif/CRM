@@ -189,3 +189,11 @@ For any questions or suggestions:
 - Name: Estifanos Zinabu
 - Email: estifanoszinabuabebe@gmail.com
 - GitHub: Kingestif
+
+# Demos
+![image1](https://github.com/user-attachments/assets/f751c28a-0514-443e-95de-e67d44ec8fdf)
+![image2](https://github.com/user-attachments/assets/81981a52-3189-421f-b53c-b9dfa804179e)
+![image3](https://github.com/user-attachments/assets/3f566a7c-6505-43fd-995f-ceb33ae38fd3)
+![image4](https://github.com/user-attachments/assets/9c3d9dae-79a5-4de7-ad38-16fb1c995364)
+![image5](https://github.com/user-attachments/assets/e24f15f5-8c60-4075-8627-ed58d26f0942)
+
